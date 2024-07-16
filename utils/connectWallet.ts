@@ -1,11 +1,22 @@
-import { ethers, Contract } from "ethers";
+import { ethers, Contract, InterfaceAbi } from "ethers";
 import stakingAbi from "../ABI/stakingAbi.json"
 import stakeTokenAbi from "../ABI/stakeTokenAbi.json";
 
+interface WalletConnection {
+    provider: ethers.BrowserProvider;
+    selectedAccount: string;
+    stakingContract: ethers.Contract;
+    stakeTokenContract: ethers.Contract;
+    chainId: number;
+}
 
-export const connectWallet = async () => {
+export const connectWallet = async (): Promise<WalletConnection> => {
     try {
-        let [signer, provider, stakingContract, stakeTokenContract, chainId] = [null, null, null, null, null];
+        let provider: ethers.BrowserProvider | null = null;
+        let stakingContract: ethers.Contract | null = null;
+        let stakeTokenContract: ethers.Contract | null = null;
+        let chainId: number | null = null;
+        let signer : any | null = null;
         if (window.ethereum === null) {
             throw new Error("Metamsk is not installed");
         }
@@ -29,8 +40,8 @@ export const connectWallet = async () => {
         const stakingContractAddress = ""
         const stakeTokenContractAddress = ""
 
-        stakingContract = new Contract(stakingContractAddress, stakingAbi, signer);
-        stakeTokenContract = new Contract(stakeTokenContractAddress, stakeTokenAbi, signer);
+        stakingContract = new Contract(stakingContractAddress, stakingAbi as InterfaceAbi, signer);
+        stakeTokenContract = new Contract(stakeTokenContractAddress, stakeTokenAbi as InterfaceAbi, signer);
 
         return { provider, selectedAccount, stakeTokenContract, stakingContract, chainId }
 
