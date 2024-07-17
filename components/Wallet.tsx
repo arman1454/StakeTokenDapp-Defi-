@@ -1,8 +1,10 @@
 "use client"
 import { connectWallet } from '@/utils/connectWallet';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { walletStore } from '@/store/states';
 import { useRouter } from "next/navigation";
+import { handleAccountChange } from '@/utils/handleAccountChange';
+import { handleChainChange } from '@/utils/handleChainChange';
 
 interface WalletState {
   provider: any | null;
@@ -25,15 +27,26 @@ const Wallet = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const wallet = walletStore((state:any)=>state.wallet)
   const updateWallet = walletStore((state:any)=>state.updateWallet)
+
+  useEffect(() => {
+    const onAccountsChanged = () => handleAccountChange(setState, updateWallet);
+    const onChainChanged = () => handleChainChange(setState, updateWallet);
+
+    window.ethereum.on('accountsChanged', onAccountsChanged);
+    window.ethereum.on('chainChanged', onChainChanged);
+
+    return () => {
+      window.ethereum.removeListener('accountsChanged', onAccountsChanged);
+      window.ethereum.removeListener('chainChanged', onChainChanged);
+    };
+  }, []);
+
+
+
   const handleWallet = async () => {
     try {
       setIsLoading(true);
       const { provider, selectedAccount, stakingContract, stakeTokenContract, chainId } = await connectWallet();
-      console.log(provider) 
-        console.log(selectedAccount) 
-        console.log(stakingContract) 
-        console.log(stakeTokenContract) 
-        console.log(chainId);
       
       setState({ provider, selectedAccount, stakingContract, stakeTokenContract, chainId })
       updateWallet({
@@ -53,6 +66,10 @@ const Wallet = () => {
   return (
     <div>
       <button onClick={handleWallet}> connect wallet</button>
+      <br />
+      <p>{wallet.selectedAccount}</p>
+      <br />
+      <p>{wallet.chainId}</p>
     </div>
   )
 }
