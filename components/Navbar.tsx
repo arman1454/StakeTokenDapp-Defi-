@@ -13,6 +13,9 @@ import {
     NavigationMenuTrigger,
     navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
+import { walletStore } from "@/store/states"
+import ConnectedNetwork from "./ConnectedNetwork"
+import { Button } from "./ui/button"
 
 const components: { title: string; href: string; description: string }[] = [
     {
@@ -52,65 +55,51 @@ const components: { title: string; href: string; description: string }[] = [
     },
 ]
 
-const Navbar = ()=> {
+const Navbar = () => {
+    const { selectedAccount,chainId } = walletStore((state: any) => state.wallet)
+    const changeAccount = async()=>{
+        const accounts = await window.ethereum.request({
+            method: 'eth_requestAccounts'
+        })
+    }
     return (
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                        <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                            <li className="row-span-3">
-                                <NavigationMenuLink asChild>
-                                    <a
-                                        className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                                        href="/"
-                                    >
-                                        <div className="mb-2 mt-4 text-lg font-medium">
-                                            shadcn/ui
-                                        </div>
-                                        <p className="text-sm leading-tight text-muted-foreground">
-                                            Beautifully designed components that you can copy and
-                                            paste into your apps. Accessible. Customizable. Open
-                                            Source.
-                                        </p>
-                                    </a>
-                                </NavigationMenuLink>
-                            </li>
-                            <ListItem href="/docs" title="Introduction">
-                                Re-usable components built using Radix UI and Tailwind CSS.
-                            </ListItem>
-                            <ListItem href="/docs/installation" title="Installation">
-                                How to install dependencies and structure your app.
-                            </ListItem>
-                            <ListItem href="/docs/primitives/typography" title="Typography">
-                                Styles for headings, paragraphs, lists...etc
-                            </ListItem>
-                        </ul>
+                    <NavigationMenuTrigger><ConnectedNetwork /></NavigationMenuTrigger>
+                    <NavigationMenuContent className="pl-8 pr-8 pb-3 pt-3">
+                        <div className="flex justify-center items-center rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md">
+                            {chainId ? (<p className="text-sm font-medium leading-none w-[200px] md:w-[200px] md:grid-cols-2 lg:w-[200px] ">
+                                chainId: {chainId}
+                            </p>) : <p className="text-sm font-medium leading-none w-[200px] md:w-[200px] md:grid-cols-2 lg:w-[200px] ">
+                                No Network Connected
+                            </p>
+                            }
+
+                        </div>
+                        {selectedAccount ? (<div className="flex justify-center items-center"><Button onClick={changeAccount}>Change Network?</Button></div>) :
+                            <div className="flex justify-center items-center"><Button onClick={changeAccount}>Connect to a Network?</Button></div>}
+
+
                     </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuTrigger>Components</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                            {components.map((component) => (
-                                <ListItem
-                                    key={component.title}
-                                    title={component.title}
-                                    href={component.href}
-                                >
-                                    {component.description}
-                                </ListItem>
-                            ))}
-                        </ul>
+                    <NavigationMenuTrigger>{selectedAccount ? selectedAccount : "No Account"}</NavigationMenuTrigger>
+                    <NavigationMenuContent className="pl-8 pr-8 pb-3 pt-3">
+                        <div className="flex justify-center items-center rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md">
+                            {selectedAccount ? (<p className="text-sm font-medium leading-none w-[200px] md:w-[200px] md:grid-cols-2 lg:w-[200px] ">
+                                Connected to the following account
+                            </p>) : <p className="text-sm font-medium leading-none w-[200px] md:w-[200px] md:grid-cols-2 lg:w-[200px] ">
+                                Not Account Connected
+                            </p>
+                            }
+
+                        </div>
+                        {selectedAccount ? (<div className="flex justify-center items-center"><Button onClick={changeAccount}>Change Account?</Button></div>):
+                            <div className="flex justify-center items-center"><Button onClick={changeAccount}>Connect Account?</Button></div>}
+                        
+
                     </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                    <Link href="/docs" legacyBehavior passHref>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                            Documentation
-                        </NavigationMenuLink>
-                    </Link>
                 </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>
