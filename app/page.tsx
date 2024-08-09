@@ -1,3 +1,4 @@
+import ApprovalAndStake from "@/components/ApprovalAndStake";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import Navbar from "@/components/Navbar";
 import TokenStatus from "@/components/TokenStatus";
@@ -9,6 +10,7 @@ export default function Home() {
       <Navbar />
       <TokenStatus />
       {/* <Wallet /> */}
+      <ApprovalAndStake/>
     </MaxWidthWrapper>
   );
 }

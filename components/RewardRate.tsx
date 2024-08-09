@@ -1,3 +1,4 @@
+"use client"
 import { walletStore } from '@/store/states'
 import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react'
